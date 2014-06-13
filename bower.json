@@ -11,8 +11,8 @@
         }
     ],
     "dependencies": {
-        "jquery": ">=1.4.4",
-        "m1ke/utils": "~edge"
+        "jquery": "/home/m1ke/web/lib/js/jquery/.git",
+        "m1ke-utils": "/home/m1ke/web/lib/js/utils/.git"
     },
     "description": "Easy overlay",
     "files": [
