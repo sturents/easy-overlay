@@ -132,7 +132,7 @@ var easyOverlay={
 				$('body').css({overflow:'hidden'});
 			}
 		}
-		$content=$('<div>').css(options.css).attr('title',' ').click(function(e){
+		$content=$('<div>').css(options.css).click(function(e){
 			e.stopPropagation();
 		}).appendTo($overlay);
 		if (typeof options.history=='object'){
@@ -224,7 +224,7 @@ var easyOverlay={
 			,'overflow-x':'hidden'
 			,'overflow-y':'auto'
 		};
-		var $overlay=$('<div>').css(css).addClass('overlay').attr({title:'Click to close',id:'overlay'+this.count});
+		var $overlay=$('<div>').css(css).addClass('overlay').attr({id:'overlay'+this.count});
 		return $overlay;
 	}
 	,level:function(noClose){
