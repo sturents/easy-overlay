@@ -297,7 +297,7 @@ var easyOverlay={
 				catch (e){
 					handler='submitSuccess';
 				}
-				this[handler](response,ajax,callback,$submit,$form);
+				self[handler](response,ajax,callback,$submit,$form);
 			}
 			,error: function(){
 				alert('The website could not be reached; there might be a problem with your connection. Please try again, or check whether you can reach other pages on the website if the problem persists.');
@@ -330,7 +330,7 @@ var easyOverlay={
 			}
 			else if (callback){
 				// can't pass APP in and keep response?
-				easyOverlay.close();
+				this.close();
 			}
 		}
 	}
