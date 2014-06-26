@@ -89,11 +89,10 @@ var easyOverlay={
 		this.count--;
 	}
 	,closeSubmit:function($overlay){
-		$overlay.css('cursor','wait').find('form:first').data('callback',function(App){
-			return function(){
-				App.closeOverlay($overlay);
-			};
-		}(this,$overlay)).each(this.onSubmit);
+		var self=this;
+		$overlay.css('cursor','wait').find('form:first').data('callback',function(){
+			self.closeOverlay($overlay);
+		}).each(this.onSubmit);
 	}
 	,create:function(options,data,overlayCall,submitCall,css,bg){
 		if (typeof options!='object'){
@@ -213,7 +212,7 @@ var easyOverlay={
 			options={};
 		}
 		var css={
-			position:((options.scroll || this.mobile) ? 'absolute' : 'fixed')
+			position:(options.scroll || this.mobile) ? 'absolute' : 'fixed'
 			,width:'100%'
 			,height:options.scroll ? 'auto' : '100%'
 			,top:this.mobile ? window.pageYOffset+'px' : 0
@@ -238,7 +237,7 @@ var easyOverlay={
 		var $form=$(this).css('cursor','wait')
 			,$submit=$(this).find('input[type="submit"]').prop('disabled',true).addClass('disabled')
 			,ajax=[]
-			,url=$form.attr('action').replace('db_','ajax_').appendQuery('ajax=1');
+			,url=$form.attr('action').replace('db_','ajax_').appendQuery('easy-overlay-submit=1');
 		$form.find('p.error').remove().end()
 		.find('div.error').removeClass('error')
 			.find('strong').remove().end().end()
@@ -249,7 +248,7 @@ var easyOverlay={
 			ajax+='&'+$clickedSubmit.attr('name')+'='+$clickedSubmit.val();
 			$clickedSubmit.attr('clicked','');
 		}
-		easyOverlay.submit(ajax,url,$submit,$form.data('callback'),$form);
+		easyOverlay.submit(ajax,url,$form.data('callback'),$submit,$form);
 	}
 	,reopen:function($overlay,loadExtend,loadReplace){
 		if (this.count>0){
@@ -281,67 +280,104 @@ var easyOverlay={
 			this.create(data);
 		}
 	}
-	,submit:function(ajax,url,$submit,callback,$form){
+	,submit:function(ajax,url,callback,$submit,$form){
+		var self=this;
 		$.ajax({
 			type:'POST'
 			,url:url
 			,data:ajax
 			,success:function(response){
-				response=response.split('|');
 				$submit.prop('disabled',false).removeClass('disabled');
 				$form.css('cursor','default');
-				if (response[0]=='success'){
-					ajax=decodeURIComponent(ajax).split('&');
-					temp={};
-					for (i in ajax){
-						if (isNumeric(i)){
-							query=ajax[i].split('=');
-							query[1] && (temp[query[0]]=query[1].replace(/\+/g,' '));
-						}
-					}
-					// temp is passed through as active object "this"
-					if (typeof callback=='function'){
-						callback.apply(temp,[response,$submit]);
-					}
-					else if (callback){
-						// can't pass APP in and keep response?
-						easyOverlay.close();
-					}
+				var handler='';
+				try {
+					response=$.parseJSON(response);
+					handler='submitSuccessJson';
 				}
-				else if (response[0]=='error'){
-					if (response[1][0]=='{' || response[1][0]=='['){
-						var selector;
-						response[0]='';
-						response={error:$.parseJSON(response.join(''))};
-						$.each(response.error,function(key,error){
-							var $input={};
-							if (isNaN(key)){
-								key=key.split('-');
-								var name=key[0].replace(/([A-Z])/,'_$1').toLowerCase();
-								selector=key[1] ? '[name="'+name+'[]"]:nth('+key[1]+')' : '[name="'+name+'"]';
-								$input=$(selector,$form);
-							}
-							if ($input.length>0){		$('<strong>'+error+'</strong>').insertAfter($input)
-								$input.addClass('error').parent().addClass('error');
-							}
-							else {
-								$form.prepend('<p class="error">'+error+'</p>')
-							}
-						});
-						$('div.overlay:last').scrollTop(0);
-					}
-					else {
-						alert('Error: '+response[1]);
-					}
+				catch (e){
+					handler='submitSuccess';
 				}
-				else {
-					alert('The website did not send back the information we expected. Please try again, or contact the site owners if the problem persists.');
-				}
+				this[handler](response,ajax,callback,$submit,$form);
 			}
 			,error: function(){
 				alert('The website could not be reached; there might be a problem with your connection. Please try again, or check whether you can reach other pages on the website if the problem persists.');
 			}
 		});
+	}
+	,parseAjax:function(ajax){
+		var temp={};
+		ajax=decodeURIComponent(ajax).split('&');
+		for (i in ajax){
+			if (isNumeric(i)){
+				query=ajax[i].split('=');
+				query[1] && (temp[query[0]]=query[1].replace(/\+/g,' '));
+			}
+		}
+		return temp;
+	}
+	,submitSuccessJson:function(response,ajax,callback,$form){
+		if (response.error){
+			if (response.error.alert){
+				alert('Error: '+response.error.alert);
+			}
+			else {
+				this.submitError(response.error);
+			}
+		}
+		else {
+			if (typeof callback=='function'){
+				callback.apply(this.parseAjax(ajax),[response,$submit]);
+			}
+			else if (callback){
+				// can't pass APP in and keep response?
+				easyOverlay.close();
+			}
+		}
+	}
+	,submitError:function(error){
+		$.each(error,function(key,error){
+			var $input={};
+			if (isNaN(key)){
+				key=key.split('-');
+				var name=key[0].replace(/([A-Z])/,'_$1').toLowerCase();
+				var selector=key[1] ? '[name="'+name+'[]"]:nth('+key[1]+')' : '[name="'+name+'"]';
+				$input=$(selector,$form);
+			}
+			if ($input.length>0){
+				$('<strong>'+error+'</strong>').insertAfter($input);
+				$input.addClass('error').parent().addClass('error');
+			}
+			else {
+				$form.prepend('<p class="error">'+error+'</p>')
+			}
+		});
+		$('div.overlay:last').scrollTop(0);
+	}
+	,submitSuccess:function(response,ajax,callback,$form){
+		response=response.split('|');
+		if (response[0]=='success'){
+			// temp is passed through as active object "this"
+			if (typeof callback=='function'){
+				callback.apply(this.parseAjax(ajax),[response,$submit]);
+			}
+			else if (callback){
+				// can't pass APP in and keep response?
+				easyOverlay.close();
+			}
+		}
+		else if (response[0]=='error'){
+			response[0]='';
+			try {
+				response={error:$.parseJSON(response.join(''))};
+				this.submitError(response.error);
+			}
+			catch (e){
+				alert('Error: '+response[1]);
+			}
+		}
+		else {
+			alert('The website did not send back the information we expected. Please try again, or contact the site owners if the problem persists.');
+		}
 	}
 };
 
