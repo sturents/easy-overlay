@@ -315,13 +315,13 @@ var easyOverlay={
 		}
 		return temp;
 	}
-	,submitSuccessJson:function(response,ajax,callback,$form){
+	,submitSuccessJson:function(response,ajax,callback,$submit,$form){
 		if (response.error){
 			if (response.error.alert){
 				alert('Error: '+response.error.alert);
 			}
 			else {
-				this.submitError(response.error);
+				this.submitError(response.error,$form);
 			}
 		}
 		else {
@@ -334,7 +334,7 @@ var easyOverlay={
 			}
 		}
 	}
-	,submitError:function(error){
+	,submitError:function(error,$form){
 		$.each(error,function(key,error){
 			var $input={};
 			if (isNaN(key)){
@@ -353,7 +353,7 @@ var easyOverlay={
 		});
 		$('div.overlay:last').scrollTop(0);
 	}
-	,submitSuccess:function(response,ajax,callback,$form){
+	,submitSuccess:function(response,ajax,callback,$submit,$form){
 		response=response.split('|');
 		if (response[0]=='success'){
 			// temp is passed through as active object "this"
@@ -369,7 +369,7 @@ var easyOverlay={
 			response[0]='';
 			try {
 				response={error:$.parseJSON(response.join(''))};
-				this.submitError(response.error);
+				this.submitError(response.error,$form);
 			}
 			catch (e){
 				alert('Error: '+response[1]);
