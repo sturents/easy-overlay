@@ -372,7 +372,7 @@ var easyOverlay={
 	,submitSuccess:function(response,ajax,callback,$submit,$form){
 		response=response.split('|');
 		if (response[0]=='success'){
-			// temp is passed through as active object "this"
+			// data is passed through as active object "this"
 			if (typeof callback=='function'){
 				callback.apply(this.parseAjax(ajax),[response,$submit]);
 			}
@@ -398,7 +398,14 @@ var easyOverlay={
 };
 
 $.fn.easyOverlay=function(options,submitCall,css){
+	// support passing the overlayCall and submitCall as separate params instead of options
 	if (typeof options!='object'){
+		if (typeof options!='function' && this.data('overlay')){
+			options=window[$(this).data('overlay')];
+		}
+		if (!submitCall && this.data('submit')){
+			submitCall=true;
+		}
 		options={
 			overlayCall:options
 			,submitCall:submitCall
@@ -413,6 +420,7 @@ $.fn.easyOverlaySubmit=function(callback){
 };
 
 $(function(){
+	$('a.easy-overlay').easyOverlay();
 	$('body').dblclick(function(){
 		$(this).css('overflow','visible');
 	});
