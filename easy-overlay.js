@@ -44,7 +44,7 @@ var easyOverlay={
 		easyOverlay.create(options);
 		//$(document).data('easythis.count',this.count);
 	}
-	,close:function($overlay,back){
+	,close:function($overlay,back,noCheck){
 		if ($('div.overlay').length>0){
 			if ($('.overlay-foreground').length>0){
 				this.backgroundClose();
