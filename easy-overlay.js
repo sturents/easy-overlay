@@ -53,14 +53,20 @@ var easyOverlay={
 			if (!$overlay){
 				$overlay=$('div.overlay:last');
 			}
-			var options=$overlay.children('div').data();
-			if (options && options.closeCallback){
-				options.closeCallback($overlay);
+			var options=$overlay.children('div').data(),closeing=false;
+			if (options) {
+				if (options.closeCheck && !noCheck && !confirm('Are you sure you wish to close this dialog box?')) {
+					return;
+				}
+				if (options.closeCallback) {
+					options.closeCallback($overlay);
+				}
+				if (options.closeSubmit) {
+					this.closeSubmit($overlay);
+					closing=true;
+				}
 			}
-			if (options && options.closeSubmit){
-				this.closeSubmit($overlay);
-			}
-			else {
+			if (!closing) {
 				this.closeOverlay($overlay,back);
 			}
 		}
@@ -118,7 +124,7 @@ var easyOverlay={
 		},options.css);
 		options.css['z-index']=(this.count*5)+1;
 		var $overlay=this.createBackground(options).data(options).click(function(){
-			easyOverlay.close($(this),((options && options.history) ? false : true));
+			easyOverlay.close($(this),(options && options.history) ? false : true);
 		});
 		
 		if (this.count>1){
@@ -126,7 +132,11 @@ var easyOverlay={
 			$('#overlay'+(this.count-1)).css({overflow:'hidden'});
 		}
 		else {
-			this.overflows[this.count]={overflow:$('body').css('overflow'),'overflow-x':$('body').css('overflow-x'),'overflow-y':$('body').css('overflow-y')};
+			this.overflows[this.count]={
+				overflow:$('body').css('overflow')
+				,'overflow-x':$('body').css('overflow-x')
+				,'overflow-y':$('body').css('overflow-y')
+			};
 			if (!options.scroll){
 				$('body').css({overflow:'hidden'});
 			}
@@ -161,8 +171,14 @@ var easyOverlay={
 			if (typeof options.closeCallback=='function'){
 				$content.data('closeCallback',options.closeCallback);
 			}
+			if (options.closeCheck) {
+				$content.data('closeCheck',1);
+			}
 			if (options.closeSubmit){
 				$content.data('closeSubmit',1);
+			}
+			if (options.foreground){
+				this.foreground($(options.foreground),$overlay);
 			}
 		}
 		else  {
