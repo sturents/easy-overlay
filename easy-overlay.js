@@ -53,7 +53,7 @@ var easyOverlay={
 			if (!$overlay){
 				$overlay=$('div.overlay:last');
 			}
-			var options=$overlay.children('div').data(),closeing=false;
+			var options=$overlay.children('div').data(),closing=false;
 			if (options) {
 				if (options.closeCheck && !noCheck && !confirm('Are you sure you wish to close this dialog box?')) {
 					return;
