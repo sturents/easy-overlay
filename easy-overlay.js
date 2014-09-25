@@ -441,7 +441,7 @@ var easyOverlay=(function(){
 					catch (e){
 						handler=submitSuccess;
 					}
-					handler.call(self,[response,ajax,callback,$submit,$form]);
+					handler.apply(self,[response,ajax,callback,$submit,$form]);
 				}
 				,error: function(){
 					alert('The website could not be reached; there might be a problem with your connection. Please try again, or check whether you can reach other pages on the website if the problem persists.');
