@@ -1,6 +1,6 @@
-/*> ../m1ke-utils/function-exists.js */
-/*> ../m1ke-utils/number.js */
-/*> ../m1ke-utils/queries.js */
+/*@include ../m1ke-utils/function-exists.js */
+/*@include ../m1ke-utils/number.js */
+/*@include ../m1ke-utils/queries.js */
 
 /*
  public methods
