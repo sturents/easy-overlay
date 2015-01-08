@@ -1,6 +1,6 @@
-/*> ../js-utils/function-exists.js */
-/*> ../js-utils/number.js */
-/*> ../js-utils/queries.js */
+/*@include ../js-utils/function-exists.js */
+/*@include ../js-utils/number.js */
+/*@include ../js-utils/queries.js */
 
 var easyOverlay={
 	count:0
