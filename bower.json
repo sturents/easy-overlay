@@ -14,7 +14,7 @@
         "jquery": "git@github.com:m1ke/jquery-bower.git",
         "js-utils": "git@github.com:m1ke/js-utils.git"
     },
-    "description": "Easy overlay",
+    "description": "A quick way to turn any link into an overlay, with AJAX form submission and callbacks",
     "files": [
         "easy-overlay.js"
     ]
