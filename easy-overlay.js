@@ -6,29 +6,34 @@ var easyOverlay={
 	count:0
 	,overflows:[]
 	,mobile:false
-	,background:function($foreground,zOffset,callback){
+	,background:function($foreground,callback){
 		var $overlay=this.createBackground({},10).click(function(){
-			easyOverlay.backgroundClose();
+			easyOverlay.backgroundClose($(this));
 		});
 		$overlay.appendTo('body');
 		$foreground.data('css',{
 			position:$foreground.css('position')
 			,'z-index':$foreground.css('z-index')
 		}).addClass('overlay-foreground').css({
-			position:'relative'
-			,'z-index':$overlay.css('z-index')+1
+			'z-index':$overlay.css('z-index')+1
+		}).each(function(){
+			if ($(this).css('position')!='absolute'){
+				$(this).css('position','relative');
+			}
 		});
 		if (callback){
 			$foreground.data('callback',callback);
 		}
+		return $overlay;
 	}
-	,backgroundClose:function($foreground){
-		$('div.overlay').remove();
+	,backgroundClose:function($overlay){
+		$overlay.remove();
 		$('.overlay-foreground').each(function(){
+			$(this).removeClass('overlay-foreground');
+			$(this).data('css') && $(this).css($(this).data('css'));
 			if (typeof $(this).data('callback')=='function'){
-				$(this).data('callback')($(this));
+				$(this).data('callback').apply(this);
 			}
-			$(this).css($(this).data('css')).removeClass('overlay-foreground');
 		});
 	}
 	,click:function(e){
@@ -45,30 +50,32 @@ var easyOverlay={
 		//$(document).data('easythis.count',this.count);
 	}
 	,close:function($overlay,back,noCheck){
-		if ($('div.overlay').length>0){
-			if ($('.overlay-foreground').length>0){
-				this.backgroundClose();
+		if ($('div.overlay').length<1){
+			return;
+		}
+		if (!$overlay){
+			$overlay=$('div.overlay:last');
+		}
+		if ($('.overlay-foreground').length>0){
+			this.backgroundClose($overlay);
+			return;
+		}
+		var options=$overlay.children('div').data()
+			,closing=false;
+		if (options) {
+			if (options.closeCheck && !noCheck && !confirm('Are you sure you wish to close this dialog box?')) {
 				return;
 			}
-			if (!$overlay){
-				$overlay=$('div.overlay:last');
+			if (options.closeCallback) {
+				options.closeCallback($overlay);
 			}
-			var options=$overlay.children('div').data(),closing=false;
-			if (options) {
-				if (options.closeCheck && !noCheck && !confirm('Are you sure you wish to close this dialog box?')) {
-					return;
-				}
-				if (options.closeCallback) {
-					options.closeCallback($overlay);
-				}
-				if (options.closeSubmit) {
-					this.closeSubmit($overlay);
-					closing=true;
-				}
+			if (options.closeSubmit) {
+				this.closeSubmit($overlay);
+				closing=true;
 			}
-			if (!closing) {
-				this.closeOverlay($overlay,back);
-			}
+		}
+		if (!closing) {
+			this.closeOverlay($overlay,back);
 		}
 	}
 	,closeButton:function(){
