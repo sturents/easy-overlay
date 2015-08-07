@@ -278,7 +278,7 @@ var easyOverlay=(function(){
 			}
 			count++;
 			options.css=options.css===false ? {} : $.extend(css.content,options.css);
-			options.css['z-index']=(count*5)+1;
+			options.css['z-index']=50 + (count*5)+1;
 
 			var $overlay=this.createBackground(options).data(options).click(function(){
 				self.close($(this),(options && options.history) ? false : true);
@@ -435,7 +435,7 @@ var easyOverlay=(function(){
 					$form.css('cursor','default');
 					var handler;
 					try {
-						response=$.parseJSON(response);
+						response=typeof response==='object' ? response : $.parseJSON(response);
 						handler=submitSuccessJson;
 					}
 					catch (e){
@@ -519,10 +519,13 @@ $.fn.extend({
 				,css:css
 			};
 		}
-		return this.unbind('click',easyOverlay.jq.click).data(options).click(easyOverlay.jq.click);
+		return this.unbind('click', easyOverlay.jq.click).data(options).click(easyOverlay.jq.click);
 	}
 	,easyOverlaySubmit:function(callback){
-		return this.unbind('submit',easyOverlay.jq.submit).submit(easyOverlay.jq.submit).data('callback',callback);
+		return this.unbind('submit', easyOverlay.jq.submit).submit(easyOverlay.jq.submit).data('callback', callback);
+	}
+	,easyOverlaySubmitOff:function(){
+		return this.unbind('submit', easyOverlay.jq.submit);
 	}
 });
 
