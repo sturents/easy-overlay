@@ -431,7 +431,6 @@ var easyOverlay=(function(){
 				,url: url
 				,data: ajax
 				,success: function(response){
-					$form.css('cursor', 'default');
 					var handler;
 					try {
 						response = typeof response==='object' ? response : $.parseJSON(response);
@@ -446,6 +445,7 @@ var easyOverlay=(function(){
 					alert('The website could not be reached; there might be a problem with your connection. Please try again, or check whether you can reach other pages on the website if the problem persists.');
 				}
 				,complete: function(jqXHR, textStatus){
+					$form.css('cursor', 'default');
 					$submit.prop('disabled', false).removeClass('disabled');
 				}
 			});
