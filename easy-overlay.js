@@ -424,37 +424,39 @@ var easyOverlay=(function(){
 				this.create(data);
 			}
 		}
-		,submit:function(ajax,url,callback,$submit,$form){
-			var self=this;
+		,submit:function(ajax, url, callback, $submit, $form){
+			var self = this;
 			$.ajax({
-				type:'POST'
-				,url:url
-				,data:ajax
-				,success:function(response){
-					$submit.prop('disabled',false).removeClass('disabled');
-					$form.css('cursor','default');
+				type: 'POST'
+				,url: url
+				,data: ajax
+				,success: function(response){
+					$form.css('cursor', 'default');
 					var handler;
 					try {
-						response=typeof response==='object' ? response : $.parseJSON(response);
-						handler=submitSuccessJson;
+						response = typeof response==='object' ? response : $.parseJSON(response);
+						handler = submitSuccessJson;
 					}
-					catch (e){
-						handler=submitSuccess;
+					catch (e){ // The response was not parsed correctly as JSON
+						handler = submitSuccess;
 					}
-					handler.apply(self,[response,ajax,callback,$submit,$form]);
+					handler.apply(self, [response, ajax, callback, $submit, $form]);
 				}
-				,error: function(){
+				,error: function(jqXHR, textStatus, errorThrown){
 					alert('The website could not be reached; there might be a problem with your connection. Please try again, or check whether you can reach other pages on the website if the problem persists.');
+				}
+				,complete: function(jqXHR, textStatus){
+					$submit.prop('disabled', false).removeClass('disabled');
 				}
 			});
 		}
 	};
 
-	cls.get={
-		count:function(){
+	cls.get = {
+		count: function(){
 			return count;
 		}
-		,css:function(){
+		,css: function(){
 			return css;
 		}
 		,overflows:function(){
