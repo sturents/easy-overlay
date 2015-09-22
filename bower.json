@@ -12,7 +12,7 @@
     ],
     "dependencies": {
         "jquery": "https://github.com/m1ke/jquery-bower.git",
-        "js-utils": "https://github.com/m1ke/js-utils.git"
+        "js-utils": "https://github.com/m1ke/js-utils.git#x1.0"
     },
     "description": "A quick way to turn any link into an overlay, with AJAX form submission and callbacks",
     "files": [
