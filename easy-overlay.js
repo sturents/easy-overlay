@@ -1,6 +1,5 @@
 /*@include ../js-utils/function-exists.js */
-/*@include ../js-utils/number.js */
-/*@include ../js-utils/queries.js */
+/*@include ../js-utils-jq/append-query.js */
 
 /*
  public methods
@@ -112,7 +111,7 @@ var easyOverlay=(function(){
 		var temp={};
 		ajax=decodeURIComponent(ajax).split('&');
 		for (i in ajax){
-			if (isNumeric(i)){
+			if ($.isNumeric(i)){
 				query=ajax[i].split('=');
 				query[1] && (temp[query[0]]=query[1].replace(/\+/g,' '));
 			}
@@ -477,7 +476,7 @@ var easyOverlay=(function(){
 			if (!$(this).data('propagate')){
 				e.stopPropagation();
 			}
-			var query=appendQuery($(this).attr('href'),'ajax=1');
+			var query = $(this).attr('href').appendQuery('ajax=1');
 			options.load=query;
 			options.data=false;
 			cls.create(options);
