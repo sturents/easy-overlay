@@ -65,10 +65,10 @@ var easyOverlay=(function(){
 		}
 		$overlay.remove();
 		if (count>1){
-			$('#overlay'+(count-1)).css({overflow:overflows[count]});
+			$('#overlay'+(count-1)).css({overflow: overflows[count]});
 		}
 		else {
-			$('body').css((overflows[1] && overflows[1].overflow) ? overflows[1] : {overflow:'visible'});
+			$('body').css((overflows[1] && overflows[1].overflow) ? overflows[1] : {overflow: 'visible', position: 'static'});
 		}
 		count--;
 	}
@@ -236,81 +236,92 @@ var easyOverlay=(function(){
 				$(this).css($(this).data('css')).removeClass('overlay-foreground');
 			});
 		}
-		,close:function($overlay,back,noCheck){
-			if ($('div.overlay').length>0){
-				if ($('.overlay-foreground').length>0){
-					this.backgroundClose();
+		,close: function($overlay,back,noCheck){
+			if ($('div.overlay').length<1){
+				return;
+			}
+			if ($('.overlay-foreground').length>0){
+				this.backgroundClose();
+				return;
+			}
+			if (!$overlay){
+				$overlay = $('div.overlay:last');
+			}
+			var options = $overlay.children('div').data()
+				,closing = false;
+			if (options) {
+				if (options.closeCheck && !noCheck && !confirm('Are you sure you wish to close this dialog box?')){
 					return;
 				}
-				if (!$overlay){
-					$overlay=$('div.overlay:last');
+				if (options.closeCallback){
+					options.closeCallback($overlay);
 				}
-				var options=$overlay.children('div').data(),closing=false;
-				if (options) {
-					if (options.closeCheck && !noCheck && !confirm('Are you sure you wish to close this dialog box?')) {
-						return;
-					}
-					if (options.closeCallback) {
-						options.closeCallback($overlay);
-					}
-					if (options.closeSubmit) {
-						closeSubmit($overlay);
-						closing=true;
-					}
-				}
-				if (!closing) {
-					closeOverlay($overlay,back);
+				if (options.closeSubmit){
+					closeSubmit($overlay);
+					closing = true;
 				}
 			}
+			if (!closing) {
+				closeOverlay($overlay,back);
+			}
 		}
-		,create:function(options,data,overlayCall,submitCall,cssContent,bg){
-			var self=this;
+		,create:function(options, data, overlayCall, submitCall, cssContent, bg){
+			var self = this;
 			if (typeof options!='object'){
-				options={
-					load:options
-					,data:data
-					,overlayCall:overlayCall
-					,submitCall:submitCall
-					,css:cssContent
-					,bg:bg
+				options = {
+					load: options
+					,data: data
+					,overlayCall: overlayCall
+					,submitCall: submitCall
+					,css: cssContent
+					,bg: bg
 				};
 			}
 			count++;
-			options.css=options.css===false ? {} : $.extend(css.content,options.css);
-			options.css['z-index']=50 + (count*5)+1;
+			options.css = options.css===false ? {} : $.extend(css.content, options.css);
+			options.css['z-index'] = 50 + (count*5)+1;
 
-			var $overlay=this.createBackground(options).data(options).click(function(){
-				self.close($(this),(options && options.history) ? false : true);
+			var $overlay = this.createBackground(options).data(options).click(function(){
+				self.close($(this), (options && options.history) ? false : true);
 			});
 			
 			if (count>1){
-				overflows[count]=$('#overlay'+(count-1)).css('overflow');
-				$('#overlay'+(count-1)).css({overflow:'hidden'});
+				overflows[count] = $('#overlay'+(count-1)).css('overflow');
+				$('#overlay'+(count-1)).css({overflow: 'hidden'});
 			}
 			else {
-				overflows[count]={
-					overflow:$('body').css('overflow')
-					,'overflow-x':$('body').css('overflow-x')
-					,'overflow-y':$('body').css('overflow-y')
+				overflows[count] = {
+					overflow: $('body').css('overflow')
+					,'overflow-x': $('body').css('overflow-x')
+					,'overflow-y': $('body').css('overflow-y')
+					,position: $('body').css('position')
 				};
 				if (!options.scroll){
-					$('body').css({overflow:'hidden'});
+					$('body').css({
+						overflow: 'hidden',
+						position: 'fixed'
+					});
 				}
 			}
-			$content=$('<div>').css(options.css).click(function(e){
-				e.stopPropagation();
+
+			$content = $('<div>').css(options.css).click(function(event){
+				event.stopPropagation();
 			}).appendTo($overlay);
+
 			if (typeof options.history=='object'){
 				$overlay.data('history',true);
-				window.history.pushState({title:$('title').text()},'',options.history.url);
+				window.history.pushState({
+					title: $('title').text()
+				}, '', options.history.url);
 				$('title').text(options.history.title);
-				window.onpopstate=function(e){
+				window.onpopstate = function(e){
 					if (e.state && e.state.title){
 						$('title').text(e.state.title);
 					}
-					self.close(false,true);
+					self.close(false, true);
 				};
 			}
+
 			if (options.data){
 				if (typeof options.data!='object'){
 					$content.append(options.data);
@@ -318,76 +329,40 @@ var easyOverlay=(function(){
 				else {
 					$content.html(options.data);
 				}
-				overlayPrepare($content,options,self);
-				// if (typeof options.overlayCall=='function'){
-				// 	options.overlayCall($content);
-				// }
-				// if (options.submitCall){
-				// 	$('form[target!="_blank"]',$content).easyOverlaySubmit(options.submitCall);
-				// }
-				// if (typeof options.closeCallback=='function'){
-				// 	$content.data('closeCallback',options.closeCallback);
-				// }
-				// if (options.closeCheck) {
-				// 	$content.data('closeCheck',1);
-				// }
-				// if (options.closeSubmit){
-				// 	$content.data('closeSubmit',1);
-				// }
-				// if (options.foreground){
-				// 	this.foreground($(options.foreground),$overlay);
-				// }
+				overlayPrepare($content, options, self);
 			}
 			else  {
 				$content.load(options.load,function(){
-					overlayPrepare($(this),options,self);
-					// if (typeof options.overlayCall=='function') {
-					// 	options.overlayCall.call(false,$(this),options.overlayOptions);
-					// }
-					// if (options.submitCall) {
-					// 	$('form',$(this)).easyOverlaySubmit(options.submitCall);
-					// }
-					// if (typeof options.closeCallback=='function') {
-					// 	$(this).data('closeCallback',options.closeCallback);
-					// }
-					// if (options.closeCheck) {
-					// 	$(this).data('closeCheck',1);
-					// }
-					// if (options.closeSubmit) {
-					// 	$(this).data('closeSubmit',1);
-					// }
-					// $(this).find('a.overlay-close').click(function(e){
-					// 	e.preventDefault();
-					// 	self.close();
-					// });
+					overlayPrepare($(this), options, self);
 					if ($(this).html()=='') {
 						$(this).html('Something has gone wrong with your connection to the website and no information was received. Click the outside of this box to close it.');
 					}
 				});
 			}
+
 			if (options.close){
 				$('<a href="#" class="close">Close</a>').click(function(e){
 					e.preventDefault();
 					self.close();
 				}).appendTo($content);
 			}
-			$body=$('body');
+			$body = $('body');
 			$overlay.appendTo($body);
 			if (options.scroll){
-				var windowHeight=$(window).height();
-				$overlay.css('height',$body.height()>windowHeight ? $body.height() : windowHeight);
+				var windowHeight = $(window).height();
+				$overlay.css('height', $body.height()>windowHeight ? $body.height() : windowHeight);
 				$body.scrollTop(0);
 			}
 		}
-		,createBackground:function(options,zOffset){
+		,createBackground: function(options, zOffset){
 			if (typeof options!='object'){
-				options={};
+				options = {};
 			}
-			var cssBg=cssBgMake(options,zOffset)
-				,$overlay=$('<div>').css(cssBg).addClass('overlay').attr({id:'overlay'+count});
+			var cssBg = cssBgMake(options, zOffset)
+				,$overlay = $('<div>').css(cssBg).addClass('overlay').attr({id: 'overlay'+count});
 			return $overlay;
 		}
-		,level:function(noClose){
+		,level: function(noClose){
 			if (!noClose){
 				this.close();
 			}
@@ -492,12 +467,12 @@ var easyOverlay=(function(){
 				.find('strong').remove().end().end()
 			.find('input.error,select.error,textarea.error').removeClass('error').next('strong').remove();
 			ajax=$form.find(':not([type="submit"])[name]').serialize();
-			var $clickedSubmit=$submit.filter('[clicked="true"]');
+			var $clickedSubmit = $submit.filter('[clicked="true"]');
 			if ($clickedSubmit.length>0){
-				ajax+='&'+$clickedSubmit.attr('name')+'='+$clickedSubmit.val();
-				$clickedSubmit.attr('clicked','');
+				ajax += '&'+$clickedSubmit.attr('name')+'='+$clickedSubmit.val();
+				$clickedSubmit.attr('clicked', '');
 			}
-			easyOverlay.submit(ajax,url,$form.data('callback'),$submit,$form);
+			easyOverlay.submit(ajax,url, $form.data('callback'), $submit, $form);
 		}
 	};
 
@@ -505,27 +480,27 @@ var easyOverlay=(function(){
 })();
 
 $.fn.extend({
-	easyOverlay:function(options,submitCall,css){
+	easyOverlay: function(options, submitCall, css){
 		// support passing the overlayCall and submitCall as separate params instead of options
 		if (typeof options!='object'){
 			if (typeof options!='function' && this.data('overlay')){
-				options=window[$(this).data('overlay')];
+				options = window[$(this).data('overlay')];
 			}
 			if (!submitCall && this.data('submit')){
-				submitCall=true;
+				submitCall = true;
 			}
-			options={
-				overlayCall:options
-				,submitCall:submitCall
-				,css:css
+			options = {
+				overlayCall: options
+				,submitCall: submitCall
+				,css: css
 			};
 		}
 		return this.unbind('click', easyOverlay.jq.click).data(options).click(easyOverlay.jq.click);
 	}
-	,easyOverlaySubmit:function(callback){
+	,easyOverlaySubmit: function(callback){
 		return this.unbind('submit', easyOverlay.jq.submit).submit(easyOverlay.jq.submit).data('callback', callback);
 	}
-	,easyOverlaySubmitOff:function(){
+	,easyOverlaySubmitOff: function(){
 		return this.unbind('submit', easyOverlay.jq.submit);
 	}
 });
@@ -533,6 +508,6 @@ $.fn.extend({
 $(function(){
 	$('a.easy-overlay').easyOverlay();
 	$('body').dblclick(function(){
-		$(this).css('overflow','visible');
+		$(this).css('overflow', 'visible');
 	});
 });
