@@ -297,10 +297,13 @@ var easyOverlay=(function(){
 					,position: $('body').css('position')
 				};
 				if (!options.scroll){
-					$('body').css({
-						overflow: 'hidden',
-						position: 'fixed'
-					});
+					var bodyCss = {
+						overflow: 'hidden'
+					};
+					if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i)){
+						bodyCss.position = 'fixed';
+					}
+					$('body').css(bodyCss);
 				}
 			}
 
@@ -309,7 +312,7 @@ var easyOverlay=(function(){
 			}).appendTo($overlay);
 
 			if (typeof options.history=='object'){
-				$overlay.data('history',true);
+				$overlay.data('history', true);
 				window.history.pushState({
 					title: $('title').text()
 				}, '', options.history.url);
