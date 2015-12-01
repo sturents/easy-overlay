@@ -454,7 +454,7 @@ var easyOverlay=(function(){
 			if (!$(this).data('propagate')){
 				e.stopPropagation();
 			}
-			var query = $(this).attr('href').appendQuery('ajax=1');
+			var query = $(this).attr('href').trim().appendQuery('ajax=1');
 			options.load=query;
 			options.data=false;
 			cls.create(options);
