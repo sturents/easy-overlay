@@ -140,6 +140,8 @@ var easyOverlay=(function(){
 	}
 
 	function submitError(errors,$form){
+		var callback;
+		
 		$.each(errors,function(key,error){
 			var $input={};
 			if (isNaN(key)){
