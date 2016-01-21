@@ -139,8 +139,8 @@ var easyOverlay=(function(){
 		}
 	}
 
-	function submitError(error,$form){
-		$.each(error,function(key,error){
+	function submitError(errors,$form){
+		$.each(errors,function(key,error){
 			var $input={};
 			if (isNaN(key)){
 				key=key.split('-');
@@ -157,6 +157,11 @@ var easyOverlay=(function(){
 			}
 		});
 		$('div.overlay:last').scrollTop(0);
+
+		callback = $form.data('callback-error');
+		if (typeof callback==='function'){
+			callback.call(null, [$form, errors]);
+		}
 	}
 
 	function submitSuccess(response,ajax,callback,$submit,$form){
