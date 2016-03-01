@@ -213,11 +213,10 @@ var easyOverlay=(function(){
 			$content.data('closeSubmit',1);
 		}
 		$('a.overlay-close',$content).click(function(e){
-			e.preventDefault();
 			self.close();
 		});
 		if (options.foreground){
-			foreground($(options.foreground),$overlay);
+			foreground($(options.foreground),$content);
 		}
 	}
 
