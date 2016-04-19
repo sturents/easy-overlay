@@ -471,10 +471,9 @@ var easyOverlay=(function(){
 				,$submit=$(this).find('input[type="submit"]').prop('disabled',true).addClass('disabled')
 				,ajax=[]
 				,url=$form.attr('action').replace('db_','ajax_').appendQuery('easy-overlay-submit=1');
-			$form.find('p.error').remove().end()
-			.find('div.error').removeClass('error')
-				.find('strong').remove().end().end()
-			.find('input.error,select.error,textarea.error').removeClass('error').next('strong').remove();
+
+			cls.jq.clearErrors($form);
+
 			ajax=$form.find(':not([type="submit"])[name]').serialize();
 			var $clickedSubmit = $submit.filter('[clicked="true"]');
 			if ($clickedSubmit.length>0){
@@ -482,6 +481,12 @@ var easyOverlay=(function(){
 				$clickedSubmit.attr('clicked', '');
 			}
 			easyOverlay.submit(ajax,url, $form.data('callback'), $submit, $form);
+		}
+		,clearErrors: function($form){
+			$form.find('p.error').remove().end()
+				.find('div.error').removeClass('error')
+				.find('strong').remove().end().end()
+				.find('input.error,select.error,textarea.error').removeClass('error').next('strong').remove();
 		}
 	};
 
