@@ -362,6 +362,7 @@ var easyOverlay=(function(){
 				$overlay.css('height', $body.height()>windowHeight ? $body.height() : windowHeight);
 				$body.scrollTop(0);
 			}
+			self.options = options;
 		}
 		,createBackground: function(options, zOffset){
 			if (typeof options!='object'){
@@ -409,6 +410,9 @@ var easyOverlay=(function(){
 		}
 		,submit:function(ajax, url, callback, $submit, $form){
 			var self = this;
+			if (typeof self.options.beforeSubmit==='function'){
+				self.options.beforeSubmit();
+			}
 			$.ajax({
 				type: 'POST'
 				,url: url
