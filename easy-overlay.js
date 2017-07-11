@@ -410,7 +410,7 @@ var easyOverlay=(function(){
 		}
 		,submit:function(ajax, url, callback, $submit, $form){
 			var self = this;
-			if (typeof self.options.beforeSubmit==='function'){
+			if (self.options && typeof self.options.beforeSubmit==='function'){
 				self.options.beforeSubmit();
 			}
 			$.ajax({
