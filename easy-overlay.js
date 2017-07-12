@@ -411,7 +411,7 @@ var easyOverlay=(function(){
 		,submit:function(ajax, url, callback, $submit, $form){
 			var self = this;
 			if (self.options && typeof self.options.beforeSubmit==='function'){
-				self.options.beforeSubmit();
+				self.options.beforeSubmit($form, $submit, ajax);
 			}
 			$.ajax({
 				type: 'POST'
