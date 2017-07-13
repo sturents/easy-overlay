@@ -208,6 +208,7 @@ var easyOverlay=(function(){
 		}
 		if (options.closeCheck) {
 			$content.data('closeCheck',1);
+            $content.data('closeCheckMessage', options.closeCheckMessage);
 		}
 		if (options.closeSubmit){
 			$content.data('closeSubmit',1);
