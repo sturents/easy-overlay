@@ -256,7 +256,8 @@ var easyOverlay=(function(){
 			var options = $overlay.children('div').data()
 				,closing = false;
 			if (options) {
-				if (options.closeCheck && !noCheck && !confirm('Are you sure you wish to close this dialog box?')){
+                var confirmMessage = options.closeCheckMessage || 'Are you sure you wish to close this dialog box?';
+                if (options.closeCheck && !noCheck && !confirm(confirmMessage)){
 					return;
 				}
 				if (options.closeCallback){
