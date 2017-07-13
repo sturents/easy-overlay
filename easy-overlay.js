@@ -208,7 +208,6 @@ var easyOverlay=(function(){
 		}
 		if (options.closeCheck) {
 			$content.data('closeCheck',1);
-            $content.data('closeCheckMessage', options.closeCheckMessage);
 		}
 		if (options.closeSubmit){
 			$content.data('closeSubmit',1);
@@ -257,12 +256,14 @@ var easyOverlay=(function(){
 			var options = $overlay.children('div').data()
 				,closing = false;
 			if (options) {
-                var confirmMessage = options.closeCheckMessage || 'Are you sure you wish to close this dialog box?';
-                if (options.closeCheck && !noCheck && !confirm(confirmMessage)){
+        if (options.closeCheck && !noCheck && !confirm('Are you sure you wish to close this dialog box?')){
 					return;
 				}
 				if (options.closeCallback){
-					options.closeCallback($overlay);
+					var returnValue = options.closeCallback($overlay);
+					if (returnValue===false){
+						return;
+					}
 				}
 				if (options.closeSubmit){
 					closeSubmit($overlay);
