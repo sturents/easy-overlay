@@ -309,9 +309,14 @@ var easyOverlay=(function(){
 					var bodyCss = {
 						overflow: 'hidden'
 					};
+                    /*
+                    // This was added perhaps to fix the issue where when the overlay is open, the background content is still scrollable - which is less of an issue.
+                    // Removing this as adding fixed position to body has a side effect that on opening the overlay, the page scrolls to the top which is not user friendly.
+                   
 					if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i)){
 						bodyCss.position = 'fixed';
 					}
+                    */
 					$('body').css(bodyCss);
 				}
 			}
